@@ -1,72 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>My Store</title>
+<title>Elegant Shop</title>
 
 <style>
+
 body{
 font-family:Arial;
 margin:0;
-background:#f4f4f4;
+background:#f5f5f5;
 }
 
 header{
-background:#222;
+background:#111;
 color:white;
-padding:15px;
+padding:20px;
 text-align:center;
 }
 
 .products{
-display:flex;
-flex-wrap:wrap;
+display:grid;
+grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:20px;
-padding:20px;
+padding:30px;
 }
 
 .product{
 background:white;
-padding:15px;
-border-radius:8px;
-width:200px;
-box-shadow:0 0 5px rgba(0,0,0,0.2);
+padding:20px;
+border-radius:10px;
+box-shadow:0 4px 10px rgba(0,0,0,0.1);
 text-align:center;
 }
 
 button{
-background:#28a745;
+background:#0077ff;
 color:white;
 border:none;
-padding:10px;
-margin-top:10px;
+padding:10px 15px;
 cursor:pointer;
 border-radius:5px;
 }
 
 button:hover{
-background:#1e7e34;
+background:#005ed1;
 }
 
 .cart{
 position:fixed;
-right:0;
-top:0;
+right:20px;
+top:80px;
+width:260px;
 background:white;
-width:250px;
-height:100%;
 padding:20px;
-box-shadow:-3px 0 10px rgba(0,0,0,0.2);
-overflow:auto;
-}
-
-.cart-item{
-display:flex;
-justify-content:space-between;
-margin-bottom:10px;
-}
-
-.checkout{
-margin-top:20px;
+border-radius:10px;
+box-shadow:0 10px 20px rgba(0,0,0,0.2);
 }
 
 input{
@@ -75,6 +63,11 @@ padding:8px;
 margin-top:5px;
 margin-bottom:10px;
 }
+
+.orderBox{
+margin-top:15px;
+}
+
 </style>
 
 </head>
@@ -82,22 +75,33 @@ margin-bottom:10px;
 <body>
 
 <header>
-<h1>My Online Store</h1>
+<h1>Elegant Shop</h1>
 </header>
 
 <div class="products" id="products"></div>
 
 <div class="cart">
-<h2>Cart</h2>
-<div id="cartItems"></div>
-<hr>
-<h3>Total: $<span id="total">0</span></h3>
 
-<div class="checkout">
+<h3>Cart</h3>
+
+<div id="cartItems"></div>
+
+<hr>
+
+<b>Total: $<span id="total">0</span></b>
+
+<div class="orderBox">
+
 <h3>Checkout</h3>
-<input id="name" placeholder="Your Name">
-<input id="address" placeholder="Address">
-<button onclick="checkout()">Place Order</button>
+
+<input id="name" placeholder="Full Name">
+
+<input id="email" placeholder="Email">
+
+<input id="address" placeholder="Shipping Address">
+
+<button onclick="placeOrder()">Place Order</button>
+
 </div>
 
 </div>
@@ -105,10 +109,10 @@ margin-bottom:10px;
 <script>
 
 const products=[
-{ id:1, name:"T-Shirt", price:25 },
-{ id:2, name:"Shoes", price:60 },
-{ id:3, name:"Hat", price:15 },
-{ id:4, name:"Backpack", price:45 }
+{id:1,name:"T-Shirt",price:25},
+{id:2,name:"Shoes",price:60},
+{id:3,name:"Backpack",price:45},
+{id:4,name:"Watch",price:120}
 ];
 
 let cart=[];
@@ -120,6 +124,7 @@ const container=document.getElementById("products");
 products.forEach(p=>{
 
 const div=document.createElement("div");
+
 div.className="product";
 
 div.innerHTML=`
@@ -137,15 +142,18 @@ container.appendChild(div);
 function addToCart(id){
 
 const product=products.find(p=>p.id===id);
+
 cart.push(product);
+
 updateCart();
 
 }
 
 function updateCart(){
 
-const cartDiv=document.getElementById("cartItems");
-cartDiv.innerHTML="";
+const cartItems=document.getElementById("cartItems");
+
+cartItems.innerHTML="";
 
 let total=0;
 
@@ -154,14 +162,10 @@ cart.forEach(item=>{
 total+=item.price;
 
 const div=document.createElement("div");
-div.className="cart-item";
 
-div.innerHTML=`
-<span>${item.name}</span>
-<span>$${item.price}</span>
-`;
+div.innerHTML=`${item.name} - $${item.price}`;
 
-cartDiv.appendChild(div);
+cartItems.appendChild(div);
 
 });
 
@@ -169,24 +173,46 @@ document.getElementById("total").innerText=total;
 
 }
 
-function checkout(){
+function placeOrder(){
 
 const name=document.getElementById("name").value;
+const email=document.getElementById("email").value;
 const address=document.getElementById("address").value;
 
-if(cart.length===0){
-alert("Cart is empty");
-return;
-}
+if(!name || !email || !address){
 
-if(!name || !address){
 alert("Please fill all fields");
+
 return;
+
 }
 
-alert("Order placed! Thank you "+name);
+if(cart.length===0){
+
+alert("Cart is empty");
+
+return;
+
+}
+
+let orderList="";
+
+cart.forEach(item=>{
+
+orderList+=item.name+" - $"+item.price+"\\n";
+
+});
+
+alert(
+"Order Confirmed!\\n\\n"+
+"Customer: "+name+"\\n"+
+"Email: "+email+"\\n\\n"+
+"Items:\\n"+orderList+
+"\\nTotal: $"+document.getElementById("total").innerText
+);
 
 cart=[];
+
 updateCart();
 
 }
