@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>Elegant Shop</title>
+<title>QuickMart Convenience Store</title>
 
 <style>
 
@@ -12,7 +12,7 @@ background:#f5f5f5;
 }
 
 header{
-background:#111;
+background:#0a7a3d;
 color:white;
 padding:20px;
 text-align:center;
@@ -34,7 +34,7 @@ text-align:center;
 }
 
 button{
-background:#0077ff;
+background:#0a7a3d;
 color:white;
 border:none;
 padding:10px 15px;
@@ -43,7 +43,7 @@ border-radius:5px;
 }
 
 button:hover{
-background:#005ed1;
+background:#06622f;
 }
 
 .cart{
@@ -64,10 +64,6 @@ margin-top:5px;
 margin-bottom:10px;
 }
 
-.orderBox{
-margin-top:15px;
-}
-
 </style>
 
 </head>
@@ -75,14 +71,15 @@ margin-top:15px;
 <body>
 
 <header>
-<h1>Elegant Shop</h1>
+<h1>QuickMart Convenience Store</h1>
+<p>Fast Snacks • Drinks • Everyday Essentials</p>
 </header>
 
 <div class="products" id="products"></div>
 
 <div class="cart">
 
-<h3>Cart</h3>
+<h3>Your Cart</h3>
 
 <div id="cartItems"></div>
 
@@ -90,29 +87,25 @@ margin-top:15px;
 
 <b>Total: $<span id="total">0</span></b>
 
-<div class="orderBox">
-
 <h3>Checkout</h3>
 
 <input id="name" placeholder="Full Name">
-
 <input id="email" placeholder="Email">
-
-<input id="address" placeholder="Shipping Address">
+<input id="address" placeholder="Delivery Address">
 
 <button onclick="placeOrder()">Place Order</button>
-
-</div>
 
 </div>
 
 <script>
 
 const products=[
-{id:1,name:"Shirt",price:250},
-{id:2,name:"Shoes",price:60},
-{id:3,name:"Backpack",price:45},
-{id:4,name:"Watch",price:120}
+{id:1,name:"Soda Can",price:2},
+{id:2,name:"Chocolate Bar",price:1.5},
+{id:3,name:"Instant Noodles",price:2.5},
+{id:4,name:"Ham Sandwich",price:4},
+{id:5,name:"Cookies Pack",price:3},
+{id:6,name:"Hot Coffee",price:2}
 ];
 
 let cart=[];
@@ -180,27 +173,19 @@ const email=document.getElementById("email").value;
 const address=document.getElementById("address").value;
 
 if(!name || !email || !address){
-
 alert("Please fill all fields");
-
 return;
-
 }
 
 if(cart.length===0){
-
 alert("Cart is empty");
-
 return;
-
 }
 
 let orderList="";
 
 cart.forEach(item=>{
-
 orderList+=item.name+" - $"+item.price+"\\n";
-
 });
 
 alert(
