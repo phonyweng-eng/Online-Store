@@ -4,7 +4,6 @@
 <title>QuickMart Convenience Store</title>
 
 <style>
-
 body{
 font-family:Arial;
 margin:0;
@@ -23,6 +22,7 @@ display:grid;
 grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
 gap:20px;
 padding:30px;
+margin-right: 300px; /* Added space so the cart doesn't overlap products */
 }
 
 .product{
@@ -31,6 +31,16 @@ padding:20px;
 border-radius:10px;
 box-shadow:0 4px 10px rgba(0,0,0,0.1);
 text-align:center;
+}
+
+/* --- NEW IMAGE STYLES --- */
+.product-img {
+width: 100%;
+height: 150px;
+object-fit: cover; /* Keeps image proportions nice */
+border-radius: 8px;
+margin-bottom: 10px;
+background: #eee; /* Light gray while loading */
 }
 
 button{
@@ -63,7 +73,6 @@ padding:8px;
 margin-top:5px;
 margin-bottom:10px;
 }
-
 </style>
 
 </head>
@@ -78,96 +87,67 @@ margin-bottom:10px;
 <div class="products" id="products"></div>
 
 <div class="cart">
-
 <h3>Your Cart</h3>
-
 <div id="cartItems"></div>
-
 <hr>
-
 <b>Total: $<span id="total">0</span></b>
-
 <h3>Checkout</h3>
-
 <input id="name" placeholder="Full Name">
 <input id="email" placeholder="Email">
 <input id="address" placeholder="Delivery Address">
-
 <button onclick="placeOrder()">Place Order</button>
-
 </div>
 
 <script>
-
+// Added 'image' property to each product
 const products=[
-{id:1,name:"Soda Can",price:2},
-{id:2,name:"Chocolate Bar",price:1.5},
-{id:3,name:"Instant Noodles",price:2.5},
-{id:4,name:"Ham Sandwich",price:4},
-{id:5,name:"Cookies Pack",price:3},
-{id:6,name:"Hot Coffee",price:2}
+{id:1, name:"Soda Can", price:2, image: "https://images.unsplash.com/photo-1622483767028-3f66f32aef97?w=300"},
+{id:2, name:"Chocolate Bar", price:1.5, image: "https://images.unsplash.com/photo-1549007994-cb92caebd54b?w=300"},
+{id:3, name:"Instant Noodles", price:2.5, image: "https://images.unsplash.com/photo-1569718212165-3a8278d5f624?w=300"},
+{id:4, name:"Ham Sandwich", price:4, image: "https://images.unsplash.com/photo-1521390188846-e2a3a97453a0?w=300"},
+{id:5, name:"Cookies Pack", price:3, image: "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?w=300"},
+{id:6, name:"Hot Coffee", price:2, image: "https://images.unsplash.com/photo-1509042239860-f550ce710b93?w=300"}
 ];
 
 let cart=[];
 
 function loadProducts(){
-
 const container=document.getElementById("products");
-
 products.forEach(p=>{
-
 const div=document.createElement("div");
-
 div.className="product";
 
+// Added the <img> tag here
 div.innerHTML=`
+<img src="${p.image}" class="product-img" alt="${p.name}">
 <h3>${p.name}</h3>
-<p>$${p.price}</p>
+<p>$${p.price.toFixed(2)}</p>
 <button onclick="addToCart(${p.id})">Add to Cart</button>
 `;
-
 container.appendChild(div);
-
 });
-
 }
 
 function addToCart(id){
-
 const product=products.find(p=>p.id===id);
-
 cart.push(product);
-
 updateCart();
-
 }
 
 function updateCart(){
-
 const cartItems=document.getElementById("cartItems");
-
 cartItems.innerHTML="";
-
 let total=0;
-
 cart.forEach(item=>{
-
 total+=item.price;
-
 const div=document.createElement("div");
-
-div.innerHTML=`${item.name} - $${item.price}`;
-
+div.innerHTML=`${item.name} - $${item.price.toFixed(2)}`;
 cartItems.appendChild(div);
-
 });
-
-document.getElementById("total").innerText=total;
-
+document.getElementById("total").innerText=total.toFixed(2);
 }
 
 function placeOrder(){
-
 const name=document.getElementById("name").value;
 const email=document.getElementById("email").value;
 const address=document.getElementById("address").value;
@@ -183,27 +163,23 @@ return;
 }
 
 let orderList="";
-
 cart.forEach(item=>{
-orderList+=item.name+" - $"+item.price+"\\n";
+orderList+=item.name+" - $"+item.price.toFixed(2)+"\n";
 });
 
 alert(
-"Order Confirmed!\\n\\n"+
-"Customer: "+name+"\\n"+
-"Email: "+email+"\\n\\n"+
-"Items:\\n"+orderList+
-"\\nTotal: $"+document.getElementById("total").innerText
+"Order Confirmed!\n\n"+
+"Customer: "+name+"\n"+
+"Email: "+email+"\n\n"+
+"Items:\n"+orderList+
+"\nTotal: $"+document.getElementById("total").innerText
 );
 
 cart=[];
-
 updateCart();
-
 }
 
 loadProducts();
-
 </script>
 
 </body>
