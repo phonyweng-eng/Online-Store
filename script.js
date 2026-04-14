@@ -34,18 +34,20 @@ function updateCart() {
     const cartItems = document.getElementById("cartItems");
     cartItems.innerHTML = "";
     let total = 0;
-    
     cart.forEach(item => {
         total += item.price;
         const div = document.createElement("div");
         div.innerHTML = `${item.name} - $${item.price.toFixed(2)}`;
         cartItems.appendChild(div);
     });
-    
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
-function placeOrder() {
+// THE EMAIL FUNCTION
+async function placeOrder(event) {
+    // If you are using a <form> tag, you need event.preventDefault()
+    if(event) event.preventDefault(); 
+
     const name = document.getElementById("name").value;
     const email = document.getElementById("email").value;
     const address = document.getElementById("address").value;
@@ -60,22 +62,38 @@ function placeOrder() {
         return;
     }
 
+    // Prepare the order list for the email
     let orderList = "";
     cart.forEach(item => {
-        orderList += item.name + " - $" + item.price.toFixed(2) + "\n";
+        orderList += item.name + " - $" + item.price.toFixed(2) + ", ";
     });
 
-    alert(
-        "Order Confirmed!\n\n" +
-        "Customer: " + name + "\n" +
-        "Email: " + email + "\n\n" +
-        "Items:\n" + orderList +
-        "\nTotal: $" + document.getElementById("total").innerText
-    );
+    // We send this data to Formspree
+    const formData = new FormData();
+    formData.append("Customer Name", name);
+    formData.append("Email", email);
+    formData.append("Address", address);
+    formData.append("Order Items", orderList);
+    formData.append("Total Price", document.getElementById("total").innerText);
 
-    cart = [];
-    updateCart();
+    // REPLACE 'YOUR_FORM_ID' with your actual Formspree ID
+    const response = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
+        method: "POST",
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+    });
+
+    if (response.ok) {
+        alert("Order Confirmed! Your order has been emailed to the shop.");
+        cart = [];
+        updateCart();
+        // Clear the inputs
+        document.getElementById("name").value = "";
+        document.getElementById("email").value = "";
+        document.getElementById("address").value = "";
+    } else {
+        alert("There was an error sending your order. Please try again.");
+    }
 }
 
-// Start the page logic
 loadProducts();
