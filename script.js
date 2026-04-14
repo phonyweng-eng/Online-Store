@@ -11,6 +11,8 @@ let cart = [];
 
 function loadProducts() {
     const container = document.getElementById("products");
+    if(!container) return;
+    container.innerHTML = ""; // Clear container
     products.forEach(p => {
         const div = document.createElement("div");
         div.className = "product";
@@ -26,77 +28,78 @@ function loadProducts() {
 
 function addToCart(id) {
     const product = products.find(p => p.id === id);
-    cart.push(product);
-    updateCart();
+    if (product) {
+        cart.push(product);
+        updateCart();
+    }
 }
 
 function updateCart() {
     const cartItems = document.getElementById("cartItems");
+    if(!cartItems) return;
     cartItems.innerHTML = "";
     let total = 0;
     cart.forEach(item => {
         total += item.price;
         const div = document.createElement("div");
-        div.innerHTML = `${item.name} - $${item.price.toFixed(2)}`;
+        div.style.padding = "5px 0";
+        div.innerHTML = `• ${item.name} - $${item.price.toFixed(2)}`;
         cartItems.appendChild(div);
     });
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
-// COMBINED EMAIL & ORDER FUNCTION
 async function placeOrder(event) {
-    // If you are using a <form> tag, this prevents the page from reloading
-    if(event) event.preventDefault(); 
+    // 1. Critical: This prevents the page from refreshing and losing the cart!
+    if (event) event.preventDefault();
 
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const address = document.getElementById("address").value;
+    const name = document.getElementById("name").value.trim();
+    const email = document.getElementById("email").value.trim();
+    const address = document.getElementById("address").value.trim();
+    const total = document.getElementById("total").innerText;
 
+    // 2. Simple Validation
     if (!name || !email || !address) {
-        alert("Please fill all fields");
+        alert("Please fill in all checkout details.");
         return;
     }
 
     if (cart.length === 0) {
-        alert("Cart is empty");
+        alert("Your cart is empty. Add some snacks first!");
         return;
     }
 
-    // 1. Prepare the item list for the email body
-    let orderList = "";
-    cart.forEach(item => {
-        orderList += `${item.name} ($${item.price.toFixed(2)})\n`;
-    });
+    // 3. Formatting the order for your email
+    let orderSummary = cart.map(item => `${item.name} ($${item.price.toFixed(2)})`).join("\n");
 
-    const total = document.getElementById("total").innerText;
-
-    // 2. Prepare the data for Formspree
     const formData = new FormData();
     formData.append("Customer Name", name);
     formData.append("Customer Email", email);
     formData.append("Delivery Address", address);
-    formData.append("Items Ordered", orderList);
-    formData.append("Total Amount", `$${total}`);
+    formData.append("Items Ordered", orderSummary);
+    formData.append("Total Price", `$${total}`);
 
-    // 3. Send the request (REPLACE 'PASTE_YOUR_ID_HERE' with your real Formspree ID)
-    const response = await fetch("https://formspree.io/f/PASTE_YOUR_ID_HERE", {
-        method: "POST",
-        body: formData,
-        headers: { 'Accept': 'application/json' }
-    });
+    // 4. Sending the data
+    try {
+        // IMPORTANT: Replace 'PASTE_YOUR_ID_HERE' with your Formspree ID
+        const response = await fetch("https://formspree.io/f/PASTE_YOUR_ID_HERE", {
+            method: "POST",
+            body: formData,
+            headers: { 'Accept': 'application/json' }
+        });
 
-    if (response.ok) {
-        alert("Success! Your order has been sent to phonyweng@gmail.com");
-        cart = []; // Clear the cart
-        updateCart();
-        // Reset form inputs
-        document.getElementById("name").value = "";
-        document.getElementById("email").value = "";
-        document.getElementById("address").value = "";
-    } else {
-        alert("Error: Could not send order. Please check your internet or Formspree ID.");
+        if (response.ok) {
+            alert(`Thanks ${name}! Your order has been sent to phonyweng@gmail.com`);
+            cart = []; // Reset cart
+            updateCart();
+            document.querySelector("form").reset(); // Clear input fields
+        } else {
+            throw new Error("Failed to send");
+        }
+    } catch (error) {
+        alert("Oops! There was a connection error. Check your Formspree ID or Internet.");
     }
 }
 
-// Start the page
+// Initialize
 loadProducts();
