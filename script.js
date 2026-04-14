@@ -43,9 +43,9 @@ function updateCart() {
     document.getElementById("total").innerText = total.toFixed(2);
 }
 
-// THE EMAIL FUNCTION
+// COMBINED EMAIL & ORDER FUNCTION
 async function placeOrder(event) {
-    // If you are using a <form> tag, you need event.preventDefault()
+    // If you are using a <form> tag, this prevents the page from reloading
     if(event) event.preventDefault(); 
 
     const name = document.getElementById("name").value;
@@ -62,38 +62,41 @@ async function placeOrder(event) {
         return;
     }
 
-    // Prepare the order list for the email
+    // 1. Prepare the item list for the email body
     let orderList = "";
     cart.forEach(item => {
-        orderList += item.name + " - $" + item.price.toFixed(2) + ", ";
+        orderList += `${item.name} ($${item.price.toFixed(2)})\n`;
     });
 
-    // We send this data to Formspree
+    const total = document.getElementById("total").innerText;
+
+    // 2. Prepare the data for Formspree
     const formData = new FormData();
     formData.append("Customer Name", name);
-    formData.append("Email", email);
-    formData.append("Address", address);
-    formData.append("Order Items", orderList);
-    formData.append("Total Price", document.getElementById("total").innerText);
+    formData.append("Customer Email", email);
+    formData.append("Delivery Address", address);
+    formData.append("Items Ordered", orderList);
+    formData.append("Total Amount", `$${total}`);
 
-    // REPLACE 'YOUR_FORM_ID' with your actual Formspree ID
-    const response = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
+    // 3. Send the request (REPLACE 'PASTE_YOUR_ID_HERE' with your real Formspree ID)
+    const response = await fetch("https://formspree.io/f/PASTE_YOUR_ID_HERE", {
         method: "POST",
         body: formData,
         headers: { 'Accept': 'application/json' }
     });
 
     if (response.ok) {
-        alert("Order Confirmed! Your order has been emailed to the shop.");
-        cart = [];
+        alert("Success! Your order has been sent to phonyweng@gmail.com");
+        cart = []; // Clear the cart
         updateCart();
-        // Clear the inputs
+        // Reset form inputs
         document.getElementById("name").value = "";
         document.getElementById("email").value = "";
         document.getElementById("address").value = "";
     } else {
-        alert("There was an error sending your order. Please try again.");
+        alert("Error: Could not send order. Please check your internet or Formspree ID.");
     }
 }
 
+// Start the page
 loadProducts();
