@@ -1,13 +1,64 @@
-async function placeOrder() {
-    // 1. Get the values from your HTML
-    const nameField = document.getElementById("name");
-    const emailField = document.getElementById("email");
-    const addressField = document.getElementById("address");
-    const totalValue = document.getElementById("total").innerText;
+const products = [
+    { id: 1, name: "Soda Can", price: 45, image: "https://i5.walmartimages.com/seo/Coca-Cola-Soda-Pop-12-fl-oz-Can_14a1f5dc-f8bf-4071-9aea-0f753c3eecf4.08041b7f0a409ee67d80e489be3c1c55.jpeg" },
+    { id: 2, name: "Chocolate Bar", price: 35, image: "https://upload.wikimedia.org/wikipedia/commons/thumb/2/27/2019-01-28_19_55_14_A_Snickers_bar_with_the_wrapper_still_intact_in_the_Dulles_section_of_Sterling%2C_Loudoun_County%2C_Virginia.jpg/1920px-2019-01-28_19_55_14_A_Snickers_bar_with_the_wrapper_still_intact_in_the_Dulles_section_of_Sterling%2C_Loudoun_County%2C_Virginia.jpg" },
+    { id: 3, name: "Instant Noodles", price: 45, image: "https://cdn-next.cybassets.com/media/W1siZiIsIjE1NjgwL3Byb2R1Y3RzLzMxOTc4NDk1LzE2MDM3Njg1MDlfN2MzMDcxMDRjYTAzMjY4YzdlZjAuanBlZyJdLFsicCIsInRodW1iIiwiNjAweDYwMCJdXQ.jpeg?sha=b237442379719d23" },
+    { id: 4, name: "Ham Sandwich", price: 60, image: "https://foodpanda.dhmedia.io/image/darkstores/nv-global-catalog/tw/1e8c51eb-8bab-45db-8591-2258f7a42666.jpg?width=176&height=176" },
+    { id: 5, name: "Original flavor Pringles", price: 70, image: "https://b2eimg.pxec.com.tw/00176055/e8ca51b873274c3684d7bc20014df4a2.jpg" },
+    { id: 6, name: "Milk Tea", price: 40, image: "https://img.91app.com/webapi/imagesV3/Cropped/SalePage/6678668/0/639058587178170000?v=1" }
+];
 
-    // 2. Validation: Make sure fields aren't empty
-    if (!nameField.value || !emailField.value || !addressField.value) {
-        alert("Please fill in all checkout fields!");
+let cart = [];
+
+function loadProducts() {
+    const container = document.getElementById("products");
+    if (!container) return;
+    container.innerHTML = "";
+    products.forEach(p => {
+        const div = document.createElement("div");
+        div.className = "product";
+        div.innerHTML = `
+            <img src="${p.image}" class="product-img" alt="${p.name}">
+            <h3>${p.name}</h3>
+            <p>$${p.price.toFixed(2)}</p>
+            <button onclick="addToCart(${p.id})">Add to Cart</button>
+        `;
+        container.appendChild(div);
+    });
+}
+
+function addToCart(id) {
+    const product = products.find(p => p.id === id);
+    if (product) {
+        cart.push(product);
+        updateCart();
+    }
+}
+
+function updateCart() {
+    const cartItems = document.getElementById("cartItems");
+    const totalSpan = document.getElementById("total");
+    if (!cartItems || !totalSpan) return;
+    
+    cartItems.innerHTML = "";
+    let total = 0;
+    cart.forEach(item => {
+        total += item.price;
+        const div = document.createElement("div");
+        div.innerText = `${item.name} - $${item.price.toFixed(2)}`;
+        cartItems.appendChild(div);
+    });
+    totalSpan.innerText = total.toFixed(2);
+}
+
+// THE FIXED ORDER FUNCTION
+async function placeOrder() {
+    const name = document.getElementById("name").value;
+    const email = document.getElementById("email").value;
+    const address = document.getElementById("address").value;
+    const total = document.getElementById("total").innerText;
+
+    if (!name || !email || !address) {
+        alert("Please fill in all fields!");
         return;
     }
 
@@ -16,43 +67,36 @@ async function placeOrder() {
         return;
     }
 
-    // 3. Create a clean list of items for the email
-    const orderItems = cart.map(item => `${item.name} ($${item.price.toFixed(2)})`).join("\n");
+    const orderSummary = cart.map(item => item.name).join(", ");
 
-    // 4. Prepare the data for Formspree using FormData (Most Reliable)
+    // Using FormData is the "Perfect" fix for Formspree errors
     const formData = new FormData();
-    formData.append("Customer Name", nameField.value);
-    formData.append("Customer Email", emailField.value);
-    formData.append("Delivery Address", addressField.value);
-    formData.append("Items Ordered", orderItems);
-    formData.append("Total Price", "$" + totalValue);
+    formData.append("Name", name);
+    formData.append("Email", email);
+    formData.append("Address", address);
+    formData.append("Items Ordered", orderSummary);
+    formData.append("Total Price", "$" + total);
 
     try {
-        // !!! REPLACE 'YOUR_ID' with the 8-character code from Formspree !!!
-        const response = await fetch("https://formspree.io/f/YOUR_ID", {
+        const response = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
             method: "POST",
             body: formData,
-            headers: {
-                'Accept': 'application/json'
-            }
+            headers: { 'Accept': 'application/json' }
         });
 
         if (response.ok) {
-            alert("Order successful! Sending email to phonyweng@gmail.com...");
-            cart = []; // Clear the cart
+            alert("Success! Order sent to phonyweng@gmail.com");
+            cart = [];
             updateCart();
-            // Clear the input fields
-            nameField.value = "";
-            emailField.value = "";
-            addressField.value = "";
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("address").value = "";
         } else {
-            // This part helps you see what went wrong
-            const errorData = await response.json();
-            console.log("Formspree Error Details:", errorData);
-            alert("Submission failed. Error: " + response.status);
+            alert("Submission failed. Did you verify your Formspree email?");
         }
     } catch (error) {
-        console.error("Network Error:", error);
-        alert("Check your internet connection!");
+        alert("Connection Error. Check the console (F12).");
     }
 }
+
+loadProducts();
