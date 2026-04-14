@@ -1,11 +1,13 @@
 async function placeOrder() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const address = document.getElementById("address").value;
-    const total = document.getElementById("total").innerText;
+    // 1. Get the values from your HTML
+    const nameField = document.getElementById("name");
+    const emailField = document.getElementById("email");
+    const addressField = document.getElementById("address");
+    const totalValue = document.getElementById("total").innerText;
 
-    if (!name || !email || !address) {
-        alert("Please fill in all fields!");
+    // 2. Validation: Make sure fields aren't empty
+    if (!nameField.value || !emailField.value || !addressField.value) {
+        alert("Please fill in all checkout fields!");
         return;
     }
 
@@ -14,38 +16,43 @@ async function placeOrder() {
         return;
     }
 
-    const orderItems = cart.map(item => item.name).join(", ");
+    // 3. Create a clean list of items for the email
+    const orderItems = cart.map(item => `${item.name} ($${item.price.toFixed(2)})`).join("\n");
 
-    // CHANGE: Use FormData instead of a JSON object
+    // 4. Prepare the data for Formspree using FormData (Most Reliable)
     const formData = new FormData();
-    formData.append("Name", name);
-    formData.append("Email", email);
-    formData.append("Address", address);
-    formData.append("Order Details", orderItems);
-    formData.append("Total Price", "$" + total);
+    formData.append("Customer Name", nameField.value);
+    formData.append("Customer Email", emailField.value);
+    formData.append("Delivery Address", addressField.value);
+    formData.append("Items Ordered", orderItems);
+    formData.append("Total Price", "$" + totalValue);
 
     try {
-        // REPLACE 'YOUR_FORM_ID' with your 8-character Formspree code
-        const response = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
+        // !!! REPLACE 'YOUR_ID' with the 8-character code from Formspree !!!
+        const response = await fetch("https://formspree.io/f/YOUR_ID", {
             method: "POST",
-            body: formData, // Sending the FormData object
+            body: formData,
             headers: {
                 'Accept': 'application/json'
-                // Note: We REMOVED 'Content-Type': 'application/json'
             }
         });
 
         if (response.ok) {
-            alert("Order successful! Sent to phonyweng@gmail.com");
-            cart = [];
+            alert("Order successful! Sending email to phonyweng@gmail.com...");
+            cart = []; // Clear the cart
             updateCart();
-            document.getElementById("name").value = "";
-            document.getElementById("email").value = "";
-            document.getElementById("address").value = "";
+            // Clear the input fields
+            nameField.value = "";
+            emailField.value = "";
+            addressField.value = "";
         } else {
-            alert("Error: Check if your Formspree ID is correct and activated.");
+            // This part helps you see what went wrong
+            const errorData = await response.json();
+            console.log("Formspree Error Details:", errorData);
+            alert("Submission failed. Error: " + response.status);
         }
     } catch (error) {
-        alert("Network error: Are you connected to the internet?");
+        console.error("Network Error:", error);
+        alert("Check your internet connection!");
     }
 }
