@@ -9,6 +9,7 @@ const products = [
 
 let cart = [];
 
+// 1. Load products into the display area
 function loadProducts() {
     const container = document.getElementById("products");
     if (!container) return;
@@ -26,6 +27,7 @@ function loadProducts() {
     });
 }
 
+// 2. Add an item to the global cart array
 function addToCart(id) {
     const product = products.find(p => p.id === id);
     if (product) {
@@ -34,6 +36,7 @@ function addToCart(id) {
     }
 }
 
+// 3. Update the cart UI and total price
 function updateCart() {
     const cartItems = document.getElementById("cartItems");
     const totalSpan = document.getElementById("total");
@@ -50,16 +53,16 @@ function updateCart() {
     totalSpan.innerText = total.toFixed(2);
 }
 
+// 4. Send the order details to Formspree
 async function placeOrder() {
-    // 1. Safety check: Find elements first
     const elName = document.getElementById("name");
     const elEmail = document.getElementById("email");
     const elAddress = document.getElementById("address");
     const elTotal = document.getElementById("total");
 
-    // Check if IDs are missing in HTML
-    if (!elName || !elEmail || !elAddress) {
-        alert("Error: HTML input IDs (name, email, or address) are missing!");
+    // Safety check for HTML structure
+    if (!elName || !elEmail || !elAddress || !elTotal) {
+        alert("Error: One or more HTML elements (name, email, address, total) are missing!");
         return;
     }
 
@@ -68,7 +71,7 @@ async function placeOrder() {
     const address = elAddress.value.trim();
     const total = elTotal.innerText;
 
-    // 2. Form Validation
+    // Validation checks
     if (!name || !email || !address) {
         alert("Please fill in all fields!");
         return;
@@ -79,8 +82,8 @@ async function placeOrder() {
         return;
     }
 
-    // 3. Prepare Data
-    const orderSummary = cart.map(item => item.name).join(", ");
+    // Format data for the email
+    const orderSummary = cart.map(item => `${item.name} ($${item.price.toFixed(2)})`).join(", ");
     const formData = new FormData();
     formData.append("Customer Name", name);
     formData.append("Email", email);
@@ -89,7 +92,7 @@ async function placeOrder() {
     formData.append("Total Paid", "$" + total);
 
     try {
-        // REPLACE 'PASTE_YOUR_ID_HERE' with your Formspree ID
+        // !!! IMPORTANT: Replace 'PASTE_YOUR_ID_HERE' with your real 8-character code !!!
         const response = await fetch("https://formspree.io/f/PASTE_YOUR_ID_HERE", {
             method: "POST",
             body: formData,
@@ -106,11 +109,13 @@ async function placeOrder() {
         } else {
             const errorText = await response.text();
             console.error("Formspree Error:", errorText);
-            alert("Formspree Error: Have you verified your email in Gmail?");
+            alert("Submission failed. Have you verified your email in Gmail?");
         }
     } catch (error) {
-        alert("Network Error: Could not reach Formspree.");
+        console.error("Network Error:", error);
+        alert("Network Error: Could not reach the server.");
     }
 }
 
+// Initialize the product list on page load
 loadProducts();
