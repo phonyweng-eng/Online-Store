@@ -50,13 +50,25 @@ function updateCart() {
     totalSpan.innerText = total.toFixed(2);
 }
 
-// THE FIXED ORDER FUNCTION
 async function placeOrder() {
-    const name = document.getElementById("name").value;
-    const email = document.getElementById("email").value;
-    const address = document.getElementById("address").value;
-    const total = document.getElementById("total").innerText;
+    // 1. Safety check: Find elements first
+    const elName = document.getElementById("name");
+    const elEmail = document.getElementById("email");
+    const elAddress = document.getElementById("address");
+    const elTotal = document.getElementById("total");
 
+    // Check if IDs are missing in HTML
+    if (!elName || !elEmail || !elAddress) {
+        alert("Error: HTML input IDs (name, email, or address) are missing!");
+        return;
+    }
+
+    const name = elName.value.trim();
+    const email = elEmail.value.trim();
+    const address = elAddress.value.trim();
+    const total = elTotal.innerText;
+
+    // 2. Form Validation
     if (!name || !email || !address) {
         alert("Please fill in all fields!");
         return;
@@ -67,35 +79,37 @@ async function placeOrder() {
         return;
     }
 
+    // 3. Prepare Data
     const orderSummary = cart.map(item => item.name).join(", ");
-
-    // Using FormData is the "Perfect" fix for Formspree errors
     const formData = new FormData();
-    formData.append("Name", name);
+    formData.append("Customer Name", name);
     formData.append("Email", email);
-    formData.append("Address", address);
-    formData.append("Items Ordered", orderSummary);
-    formData.append("Total Price", "$" + total);
+    formData.append("Shipping Address", address);
+    formData.append("Items", orderSummary);
+    formData.append("Total Paid", "$" + total);
 
     try {
-        const response = await fetch("https://formspree.io/f/YOUR_FORM_ID", {
+        // REPLACE 'PASTE_YOUR_ID_HERE' with your Formspree ID
+        const response = await fetch("https://formspree.io/f/PASTE_YOUR_ID_HERE", {
             method: "POST",
             body: formData,
             headers: { 'Accept': 'application/json' }
         });
 
         if (response.ok) {
-            alert("Success! Order sent to phonyweng@gmail.com");
+            alert("Order successful! Sending to phonyweng@gmail.com");
             cart = [];
             updateCart();
-            document.getElementById("name").value = "";
-            document.getElementById("email").value = "";
-            document.getElementById("address").value = "";
+            elName.value = "";
+            elEmail.value = "";
+            elAddress.value = "";
         } else {
-            alert("Submission failed. Did you verify your Formspree email?");
+            const errorText = await response.text();
+            console.error("Formspree Error:", errorText);
+            alert("Formspree Error: Have you verified your email in Gmail?");
         }
     } catch (error) {
-        alert("Connection Error. Check the console (F12).");
+        alert("Network Error: Could not reach Formspree.");
     }
 }
 
