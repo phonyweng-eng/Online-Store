@@ -1,3 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>QuickMart Convenience Store</title>
+<style>
+/* Your original styles - No changes made */
+body{font-family:Arial;margin:0;background:#f5f5f5;}
+header{background:#0a7a3d;color:white;padding:20px;text-align:center;}
+.products{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:20px;padding:30px;margin-right: 300px;}
+.product{background:white;padding:20px;border-radius:10px;box-shadow:0 4px 10px rgba(0,0,0,0.1);text-align:center;}
+.product-img {width: 100%;height: 150px;object-fit: cover;border-radius: 8px;margin-bottom: 10px;background: #eee;}
+button{background:#0a7a3d;color:white;border:none;padding:10px 15px;cursor:pointer;border-radius:5px;}
+button:hover{background:#06622f;}
+.cart{position:fixed;right:20px;top:80px;width:260px;background:white;padding:20px;border-radius:10px;box-shadow:0 10px 20px rgba(0,0,0,0.2);}
+input{width:100%;padding:8px;margin-top:5px;margin-bottom:10px;}
+</style>
+</head>
+<body>
+
+<header>
+    <h1>QuickMart Convenience Store</h1>
+    <p>Fast Snacks • Drinks • Everyday Essentials</p>
+</header>
+
+<div class="products" id="products"></div>
+
+<div class="cart">
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <hr>
+    <b>Total: $<span id="total">0</span></b>
+    <h3>Checkout</h3>
+    <input id="name" placeholder="Full Name">
+    <input id="email" placeholder="Email">
+    <input id="address" placeholder="Delivery Address">
+    <!-- Updated button to handle the email process -->
+    <button id="orderBtn" onclick="placeOrder()">Place Order</button>
+</div>
+
 <script>
 const products=[
 {id:1, name:"Soda Can", price: 45, image: "https://i5.walmartimages.com/seo/Coca-Cola-Soda-Pop-12-fl-oz-Can_14a1f5dc-f8bf-4071-9aea-0f753c3eecf4.08041b7f0a409ee67d80e489be3c1c55.jpeg"},
@@ -11,86 +50,85 @@ const products=[
 let cart=[];
 
 function loadProducts(){
-const container=document.getElementById("products");
-products.forEach(p=>{
-const div=document.createElement("div");
-div.className="product";
-div.innerHTML=`
-<img src="${p.image}" class="product-img" alt="${p.name}">
-<h3>${p.name}</h3>
-<p>$${p.price.toFixed(2)}</p>
-<button onclick="addToCart(${p.id})">Add to Cart</button>
-`;
-container.appendChild(div);
-});
+    const container=document.getElementById("products");
+    products.forEach(p=>{
+        const div=document.createElement("div");
+        div.className="product";
+        div.innerHTML=`<img src="${p.image}" class="product-img" alt="${p.name}"><h3>${p.name}</h3><p>$${p.price.toFixed(2)}</p><button onclick="addToCart(${p.id})">Add to Cart</button>`;
+        container.appendChild(div);
+    });
 }
 
 function addToCart(id){
-const product=products.find(p=>p.id===id);
-cart.push(product);
-updateCart();
+    const product=products.find(p=>p.id===id);
+    cart.push(product);
+    updateCart();
 }
 
 function updateCart(){
-const cartItems=document.getElementById("cartItems");
-cartItems.innerHTML="";
-let total=0;
-cart.forEach(item=>{
-total+=item.price;
-const div=document.createElement("div");
-div.innerHTML=`${item.name} - $${item.price.toFixed(2)}`;
-cartItems.appendChild(div);
-});
-document.getElementById("total").innerText=total.toFixed(2);
-}
-
-// WE ADDED ASYNC HERE TO TALK TO THE EMAIL SERVER
-async function placeOrder(){
-const name=document.getElementById("name").value;
-const email=document.getElementById("email").value;
-const address=document.getElementById("address").value;
-
-if(!name || !email || !address){
-alert("Please fill all fields");
-return;
-}
-
-if(cart.length===0){
-alert("Cart is empty");
-return;
-}
-
-let orderList="";
-cart.forEach(item=>{
-orderList+=item.name+" - $"+item.price.toFixed(2)+"\n";
-});
-
-// THIS NEW ADDITION SENDS THE DATA TO phonyweng@gmail.com
-try {
-    const response = await fetch("https://formspree.io/f/mqakprow", {
-        method: "POST",
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            Customer: name,
-            Email: email,
-            Address: address,
-            Items: orderList,
-            Total: "$" + document.getElementById("total").innerText
-        })
+    const cartItems=document.getElementById("cartItems");
+    cartItems.innerHTML="";
+    let total=0;
+    cart.forEach(item=>{
+        total+=item.price;
+        const div=document.createElement("div");
+        div.innerHTML=`${item.name} - $${item.price.toFixed(2)}`;
+        cartItems.appendChild(div);
     });
-
-    if (response.ok) {
-        alert("Order Sent! phonyweng@gmail.com will receive it soon.");
-        cart=[];
-        updateCart();
-    } else {
-        // This explains the error in Screenshot 2026-05-06 at 3.28.55 PM.png
-        alert("Submission failed. Go to phonyweng@gmail.com and click 'Verify' in the Formspree email.");
-    }
-} catch (error) {
-    alert("Connection error.");
+    document.getElementById("total").innerText=total.toFixed(2);
 }
+
+// THIS IS THE ADDED PART TO MAKE EMAILS WORK
+async function placeOrder(){
+    const name=document.getElementById("name").value;
+    const email=document.getElementById("email").value;
+    const address=document.getElementById("address").value;
+    const btn=document.getElementById("orderBtn");
+
+    if(!name || !email || !address || cart.length === 0){
+        alert("Please fill all fields and add items to cart.");
+        return;
+    }
+
+    btn.innerText = "Sending...";
+    btn.disabled = true;
+
+    let orderList = cart.map(item => `${item.name} ($${item.price.toFixed(2)})`).join(", ");
+
+    try {
+        // This URL sends the data to your Gmail bridge
+        const response = await fetch("https://formspree.io/f/mqakprow", {
+            method: "POST",
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                Customer_Name: name,
+                Customer_Email: email,
+                Address: address,
+                Items: orderList,
+                Total: "$" + document.getElementById("total").innerText
+            })
+        });
+
+        if (response.ok) {
+            alert("Order Success! phonyweng@gmail.com will receive the details.");
+            cart = [];
+            updateCart();
+            document.getElementById("name").value = "";
+            document.getElementById("email").value = "";
+            document.getElementById("address").value = "";
+        } else {
+            alert("Failed. Please check phonyweng@gmail.com for a verification email!");
+        }
+    } catch (err) {
+        alert("Error connecting to the email service.");
+    } finally {
+        btn.innerText = "Place Order";
+        btn.disabled = false;
+    }
 }
 
 loadProducts();
 </script>
+
+</body>
+</html>
