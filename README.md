@@ -50,7 +50,6 @@ const products=[
 {id:6, name:"Milk Tea", price: 40, image: "https://img.91app.com/webapi/imagesV3/Cropped/SalePage/6678668/0/639058587178170000?v=1"}
 ];
 
-// Cart now stores items as objects: { product: productObj, quantity: X }
 let cart=[];
 
 function loadProducts(){
@@ -120,12 +119,11 @@ return;
 btn.innerText = "Sending Order...";
 btn.disabled = true;
 
-// Beautifully formatted order details for your email notification
 let orderDetails = cart.map(item => `${item.product.name} (x${item.quantity}) - $${(item.product.price * item.quantity).toFixed(2)}`).join("\n");
 
 try {
-// Replace 'mqakprow' with your verified Formspree ID if it changes
-const response = await fetch("https://formspree.io/f/mqakprow", {
+// Submitting directly to the specified email address
+const response = await fetch("https://formspree.io/f/phonyweng@gmail.com", {
 method: "POST",
 headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
 body: JSON.stringify({
@@ -139,14 +137,14 @@ Total_Price: "$" + document.getElementById("total").innerText
 });
 
 if (response.ok) {
-alert("Order Confirmed! The store owner has been notified.");
+alert("Order Sent! Please check phonyweng@gmail.com to see if you need to confirm the Formspree activation.");
 cart=[];
 updateCart();
 document.getElementById("name").value = "";
 document.getElementById("email").value = "";
 document.getElementById("address").value = "";
 } else {
-alert("Submission failed. Please ensure phonyweng@gmail.com has verified this form target on Formspree.");
+alert("Submission failed. Make sure phonyweng@gmail.com has clicked 'Verify' or 'Activate' in the email Formspree sent.");
 }
 } catch (error) {
 alert("Connection error. Please try again.");
