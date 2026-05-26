@@ -1,46 +1,69 @@
-/* Individual Product Cards */
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    background: #f5f5f5;
+}
+
+header {
+    background: #0a7a3d;
+    color: white;
+    padding: 20px;
+    text-align: center;
+}
+
+.products {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+    padding: 30px;
+    margin-right: 300px; 
+}
+
 .product {
     background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
     text-align: center;
-    
-    /* FIX 1: Set an exact, matching height for every card */
-    height: 320px; 
-    
-    /* FIX 2: Use flexbox layout to distribute content evenly inside the card */
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between; 
-    align-items: center;
-    box-sizing: border-box;
-    overflow: hidden; 
 }
 
-/* Strict Image Sizing Control */
 .product-img {
     width: 100%;
-    height: 140px;      /* FIX 3: Force the image section to a fixed uniform box */
-    max-height: 140px;
-    object-fit: contain; /* Shrinks or expands the image to fit without stretching it */
+    height: 150px;
+    object-fit: cover;
     border-radius: 8px;
     margin-bottom: 10px;
-    background: #f9f9f9;
+    background: #eee;
 }
 
-/* Fix product titles so long text doesn't push elements around */
-.product h3 {
-    font-size: 16px;
-    margin: 5px 0;
+button {
+    background: #0a7a3d;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    cursor: pointer;
+    border-radius: 5px;
+}
+
+button:hover {
+    background: #06622f;
+}
+
+.cart {
+    position: fixed;
+    right: 20px;
+    top: 80px;
+    width: 260px;
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+}
+
+input {
     width: 100%;
-    white-space: nowrap;     /* Prevents text from breaking onto a second line */
-    overflow: hidden;        /* Hides excess text */
-    text-overflow: ellipsis; /* Adds "..." to the end of extra long titles */
-}
-
-.product p {
-    margin: 5px 0;
-    font-weight: bold;
-    color: #333;
+    padding: 8px;
+    margin-top: 5px;
+    margin-bottom: 10px;
+    box-sizing: border-box;
 }
