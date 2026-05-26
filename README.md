@@ -122,7 +122,7 @@ document.getElementById("name").value = "";
 document.getElementById("email").value = "";
 document.getElementById("address").value = "";
 } else {
-// This explains the error in Screenshot 2026-05-06 at 3.28.55 PM.png
+// This explains the error in Screenshot 2026-05-06 at 3.28.55 PM.png
 alert("Submission failed. You MUST click 'Verify' in the email Formspree sent to phonyweng@gmail.com.");
 }
 } catch (error) {
@@ -138,4 +138,3 @@ loadProducts();
 
 </body>
 </html>
-help me fix this code to let my shop work
