@@ -2,35 +2,32 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>QuickMart Convenience Store</title>
-    <!-- Link to your CSS file -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<header>
-    <h1>QuickMart Convenience Store</h1>
-    <p>Fast Snacks • Drinks • Everyday Essentials</p>
-</header>
+    <header>
+        <h1>QuickMart Convenience Store</h1>
+        <p>Fast Snacks • Drinks • Everyday Essentials</p>
+    </header>
 
-<!-- Product Display Area -->
-<div class="products" id="products"></div>
+    <div class="products" id="products"></div>
 
-<!-- Shopping Cart and Checkout Form -->
-<div class="cart">
-    <h3>Your Cart</h3>
-    <div id="cartItems"></div>
-    <hr>
-    <b>Total: $<span id="total">0.00</span></b>
-    
-    <h3>Checkout</h3>
-    <input id="name" placeholder="Full Name">
-    <input id="email" placeholder="Email">
-    <input id="address" placeholder="Delivery Address">
-    <button id="submitBtn" onclick="placeOrder()">Place Order</button>
-</div>
+    <div class="cart">
+        <h3>Your Cart</h3>
+        <div id="cartItems"></div>
+        <hr>
+        <b>Total: $<span id="total">0.00</span></b>
+        
+        <h3>Checkout</h3>
+        <input id="name" placeholder="Full Name">
+        <input id="email" placeholder="Email">
+        <input id="address" placeholder="Delivery Address">
+        <button id="submitBtn" onclick="placeOrder()">Place Order</button>
+    </div>
 
-<!-- Link to your JavaScript file -->
-<script src="script.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
