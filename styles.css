@@ -34,12 +34,12 @@ header {
     overflow: hidden; /* Stops oversize elements from bleeding out */
 }
 
-/* Strict Image Sizing & Control */
+/* FIXED IMAGE SIZING: This forces images to be uniform and proportional */
 .product-img {
     width: 100%;
     height: 150px;
     max-height: 150px;
-    object-fit: contain; /* Keeps original aspect ratio clean without zooming */
+    object-fit: contain; /* Keeps original aspect ratio clean without zooming or blowing up */
     border-radius: 8px;
     margin-bottom: 10px;
     background: #f9f9f9;
