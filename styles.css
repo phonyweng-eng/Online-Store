@@ -1,5 +1,6 @@
+/* General Page Styling */
 body {
-    font-family: Arial;
+    font-family: Arial, sans-serif;
     margin: 0;
     background: #f5f5f5;
 }
@@ -11,31 +12,40 @@ header {
     text-align: center;
 }
 
+/* Product Section Constraints */
 .products {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
     gap: 20px;
     padding: 30px;
-    margin-right: 300px; /* Space for the fixed cart */
+    margin-right: 340px; /* Leave space for the fixed side-cart */
 }
 
+/* Individual Product Cards */
 .product {
     background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    overflow: hidden; /* Stops oversize elements from bleeding out */
 }
 
+/* Strict Image Sizing & Control */
 .product-img {
     width: 100%;
     height: 150px;
-    object-fit: cover;
+    max-height: 150px;
+    object-fit: contain; /* Keeps original aspect ratio clean without zooming */
     border-radius: 8px;
     margin-bottom: 10px;
-    background: #eee;
+    background: #f9f9f9;
 }
 
+/* Interactive Buttons */
 button {
     background: #0a7a3d;
     color: white;
@@ -43,26 +53,34 @@ button {
     padding: 10px 15px;
     cursor: pointer;
     border-radius: 5px;
+    font-weight: bold;
 }
 
 button:hover {
     background: #06622f;
 }
 
+/* Shopping Cart Side Panel */
 .cart {
     position: fixed;
     right: 20px;
     top: 80px;
-    width: 260px;
+    width: 280px;
     background: white;
     padding: 20px;
     border-radius: 10px;
-    box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+    max-height: 80vh;
+    overflow-y: auto; /* Adds a scrollbar if the cart gets too full */
 }
 
+/* Input Fields Box Optimization */
 input {
     width: 100%;
     padding: 8px;
     margin-top: 5px;
     margin-bottom: 10px;
+    box-sizing: border-box; /* Ensures padding does not break layout width */
+    border: 1px solid #ccc;
+    border-radius: 4px;
 }
